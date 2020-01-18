@@ -18,7 +18,7 @@ function find() {
   return db("posts");
 }
 
-//calling find returns a promise that resolves to an array of all the posts contained in the database.
+//this method expects an id as it's only parameter and returns the post corresponding to the id provided or an empty array if no post with that id is found.
 function findById(id) {
   return db("posts").where({ id: Number(id) });
 }

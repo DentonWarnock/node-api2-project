@@ -80,8 +80,46 @@ router.get("/", (req, res) => {
 });
 
 //Returns the post object with the specified id.
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
+
+  db.findById(id)
+    .then(post => {
+      if (!post) {
+        res
+          .status(404)
+          .json({ message: "The post with the specified ID does not exist." });
+      } else {
+        res.status(200).json(post);
+      }
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .json({ error: "The post information could not be retrieved." });
+    });
+});
 
 //Returns an array of all the comment objects associated with the post with the specified id.
+router.get("/:id/comments", (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    res
+      .status(404)
+      .json({ message: "The post with the specified ID does not exist." });
+  } else {
+    db.findPostComments(id)
+      .then(comments => {
+        res.status(200).json(comments);
+      })
+      .catch(err =>
+        res
+          .status(500)
+          .json({ error: "The comments information could not be retrieved." })
+      );
+  }
+});
 
 //Removes the post with the specified id and returns the deleted post object.
 //You may need to make additional calls to the database in order to satisfy this requirement.
