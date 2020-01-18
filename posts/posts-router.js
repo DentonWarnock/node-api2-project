@@ -149,5 +149,31 @@ router.delete("/:id", (req, res) => {
 
 //Updates the post with the specified id using data from the request body.
 //Returns the modified document, NOT the original.
+router.put("/:id", (req, res) => {
+  const updatedPost = req.body;
+  const { id } = req.params;
+
+  db.findById(id).then(post => {
+    if (!post.length > 0) {
+      res
+        .status(404)
+        .json({ message: "The post with the specified ID does not exist." });
+    } else {
+      db.update(id, updatedPost)
+        .then(number => {
+          if (number) {
+            db.findById(id).then(newPost => {
+              res.status(200).json(newPost);
+            });
+          }
+        })
+        .catch(err =>
+          res
+            .status(500)
+            .json({ error: "The post information could not be modified." })
+        );
+    }
+  });
+});
 
 module.exports = router;
