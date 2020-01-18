@@ -85,7 +85,7 @@ router.get("/:id", (req, res) => {
 
   db.findById(id)
     .then(post => {
-      if ((post = [])) {
+      if (!post.length > 0) {
         res
           .status(404)
           .json({ message: "The post with the specified ID does not exist." });
@@ -105,7 +105,7 @@ router.get("/:id/comments", (req, res) => {
   const { id } = req.params;
 
   db.findById(id).then(post => {
-    if ((post = [])) {
+    if (!post.length > 0) {
       res
         .status(404)
         .json({ message: "The post with the specified ID does not exist." });
@@ -128,11 +128,23 @@ router.get("/:id/comments", (req, res) => {
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
 
-  if (!id) {
-    res
-      .status(404)
-      .json({ message: "The post with the specified ID does not exist." });
-  }
+  db.findById(id).then(post => {
+    if (!post.length > 0) {
+      res
+        .status(404)
+        .json({ message: "The post with the specified ID does not exist." });
+    } else {
+      db.remove(id)
+        .then(number => {
+          res
+            .status(200)
+            .json({ message: `Successfully removed ${number} post` });
+        })
+        .catch(err =>
+          res.status(500).json({ error: "The post could not be removed" })
+        );
+    }
+  });
 });
 
 //Updates the post with the specified id using data from the request body.
